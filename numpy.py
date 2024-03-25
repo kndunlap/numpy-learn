@@ -146,3 +146,251 @@ plt.hist(heights)
 
 #%% Computation on arrays - broadcasting.
 
+import numpy as np
+a = np.array([0, 1, 2])
+b = np.array([5, 5, 5])
+a + b
+
+M = np.ones((2,3))
+a = np.arange(3)
+M + a
+
+a = np.arange(3).reshape((3,1))
+a
+b = np.arange(3)
+a
+b
+a.shape = (3,1)
+b.shape = (3,)
+a.shape
+b.shape
+a
+b
+
+M = np.ones((3,2))
+a = np.arange(3)
+M
+a
+M + a
+
+a[:, np.newaxis].shape
+M + a[:, np.newaxis]
+a
+
+X = np.random.random((10,3))
+X
+Xmean = X.mean(0)
+Xmean
+X_centered = X - Xmean
+X_centered
+X_centered.mean(0)
+
+#%% Comparisons, Masks and Boolean Logic
+
+import pandas as pd
+rainfall = pd.read_csv("Seattle2014.csv")['PRCP'].values
+inches = rainfall/254.0
+inches.shape
+plt.hist(inches, 40)
+
+x = np.array([1, 2, 3, 4, 5])
+x < 3
+x > 3
+x <= 3
+
+(2 * x) == (x ** 2)
+
+
+rng = np.random.RandomState(0)
+x = rng.randint(10, size = (3, 4))
+x
+print(x)
+
+np.count_nonzero(x < 6)
+
+np.any(x == 8)
+
+np.sum((inches > 0.5) & (inches < 1))
+
+np.sum(~( (inches <=0.5) | (inches >=1)))
+
+print("Days with more than 0.5 inches:", np.sum(inches > 0.5))
+                                        
+x
+x = x[x < 5]
+x
+
+rainy = (inches > 0)
+days = np.arange(365)
+days
+summer = (days > 172) & (days < 262)
+np.max(inches[summer])
+rainy
+inches
+summer
+
+#%% Fancy Indexing
+
+rand = np.random.RandomState(42)
+x = rand.randint(100, size = 10)
+x
+[x[3], x[7], x[2]]
+ind = [3, 7, 4]
+x[ind]
+
+ind = np.array([[3, 7],
+                [4, 5]])
+
+x[ind]
+
+X = np.arange(12).reshape((3, 4))
+X
+row = np.array([0, 1, 2])
+col = np.array([2, 1, 3])
+X[row, col]
+
+X[row[:, np.newaxis], col]
+X
+
+row[:, np.newaxis] * col
+
+print(X)
+X[2, [2, 0, 1]]
+
+X[1:, [2, 0, 1]]
+
+mask = np.array([1, 0, 1, 0], dtype = bool)
+mask
+X[row[:, np.newaxis], mask]
+
+mean = [0, 0]
+cov = [[1, 2],
+       [2, 5]]
+X = rand.multivariate_normal(mean, cov, 100)
+X.shape
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+import seaborn; seaborn.set()
+plt.scatter(X[:, 0], X[:, 1]);
+
+indices = np.random.choice(X.shape[0], 20, replace = False)
+indices
+selection = X[indices]
+selection.shape
+
+x = np.arange(10)
+i = np.array([2, 1, 8, 4])
+i
+x[i] = 99
+x
+i
+
+
+
+x = np.zeros(10)
+x
+x[[0, 0]] = [4, 6]
+x
+
+i = [2, 3, 3, 4, 4, 4]
+x[i] += 1
+x
+
+x = np.zeros(10)
+np.add.at(x, i, 1)
+print(x)
+
+np.random.seed(42)
+x = np.random.randn(100)
+x
+bins = np.linspace(-5, 5, 20)
+bins
+counts = np.zeros_like(bins)
+counts
+i = np.searchsorted(bins, x)
+i
+np.add.at(counts, i , 1)
+bins
+
+counts
+plt.plot(bins, counts)
+
+#%% Sorting Arrays
+
+def selection_sort(x):
+    for i in range(len(x)):
+        swap = i + np.argmin(x[i:])
+        (x[i], x[swap]) = (x[swap], x[i])
+    return x
+
+x = np.array([2, 1, 4, 3, 5])
+selection_sort(x)
+
+x = np.array([2, 1, 4, 3, 5])
+np.sort(x)
+x.sort()
+x
+print(x)
+
+x = np.array([2, 1, 4, 3, 5])
+i = np.argsort(x)
+print(i)
+
+x = np.array([7, 2, 3, 1, 6, 5, 4])
+np.partition(x, 3)
+
+X = rand.rand(10, 2)
+X
+
+plt.scatter(X[:, 0], X[:, 1], s = 100)
+
+dist_sq = np.sum((X[:, np.newaxis, :] - X[np.newaxis, :, :]) ** 2, axis=-1)
+dist_sq
+
+dist_sq.diagonal()
+nearest = np.argsort(dist_sq, axis = 1)
+print(nearest)
+K = 2
+nearest_partition = np.argpartition(dist_sq, K + 1, axis = 1)
+nearest_partition
+
+differences = X[:, np.newaxis, :] - X[np.newaxis, :, ]
+differences
+
+#%% Structured Data
+name = ['Alice', 'Bob', 'Cathy', 'Doug']
+name
+age = [25, 45, 37, 19]
+weight = [55.0, 85.5, 68.0, 61.5]
+
+x = np.zeros(4, dtype = int)
+x
+data = np.zeros(4, dtype = {'names':('name', 'age', 'weight'),
+                            'formats':('U10', 'i4', 'f8')})
+data
+data['name'] = name
+data['age'] = age
+data['weight'] = weight
+data
+data['name']
+data[0]
+data[-1]['name']
+data[data['age'] < 30]['name']
+
+np.dtype([('name', 'S10'), ('age', '<i4'), ('weight', '<f8')])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
