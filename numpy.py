@@ -380,9 +380,9 @@ data[data['age'] < 30]['name']
 
 np.dtype([('name', 'S10'), ('age', '<i4'), ('weight', '<f8')])
 
-
-
-
+import os
+os.chdir('/Users/u1314571/Desktop')
+os.getcwd()
 
 
 
